@@ -17,21 +17,65 @@ namespace TrybeHotel.Repository
 
         public UserDto Login(LoginDto login)
         {
-            throw new NotImplementedException();
+            User newUser = _context.Users!.FirstOrDefault(user => user.Email == login.Email && user.Password == login.Password)!;
+
+            if (newUser == null) return null!;
+            return new UserDto()
+            {
+                UserId = newUser.UserId,
+                Name = newUser.Name!,
+                Email = newUser.Email!,
+                UserType = newUser.UserType!,
+            };
         }
         public UserDto Add(UserDtoInsert user)
         {
-            throw new NotImplementedException();
+            var email = GetUserByEmail(user.Email!);
+            if (email != null) return null;
+
+            var newUser = _context.Users.Add(new User()
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Password = user.Password,
+                UserType = "client",
+            });
+
+            _context.SaveChanges();
+
+            return new UserDto()
+            {
+                UserId = newUser.Entity.UserId,
+                Name = newUser.Entity.Name,
+                Email = newUser.Entity.Email,
+                UserType = newUser.Entity.UserType!,
+            };
         }
 
         public UserDto GetUserByEmail(string userEmail)
         {
-             throw new NotImplementedException();
+            var user = _context.Users.FirstOrDefault(users => users.Email.Equals(userEmail));
+
+            if (user == null) return null!;
+
+            return new UserDto
+            {
+                UserId = user.UserId,
+                Email = user.Email,
+                Name = user.Name,
+                UserType = user.UserType
+            };
         }
 
         public IEnumerable<UserDto> GetUsers()
         {
-            throw new NotImplementedException();
+            return _context.Users.Select(u => new UserDto
+            {
+                UserId = u.UserId,
+                Email = u.Email,
+                Name = u.Name,
+                UserType = u.UserType
+            });
         }
 
     }
